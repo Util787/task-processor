@@ -1,9 +1,12 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // Env variants
@@ -49,6 +52,11 @@ type TaskProcessQueueConfig struct {
 }
 
 func MustLoadConfig() *Config {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("No .env file found, using system environment variables")
+	}
+
 	cfg := &Config{}
 
 	cfg.Env = os.Getenv("ENV")
@@ -64,7 +72,6 @@ func MustLoadConfig() *Config {
 		cfg.HTTPServerConfig.Host = defaultHttpServerHost
 	}
 
-	var err error
 	cfg.HTTPServerConfig.Port, err = strconv.Atoi(os.Getenv("HTTP_SERVER_PORT"))
 	if err != nil {
 		cfg.HTTPServerConfig.Port = defaultHttpServerPort
